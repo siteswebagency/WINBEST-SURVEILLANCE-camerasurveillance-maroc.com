@@ -772,7 +772,7 @@ function test_input($data)
 
 
 <script>
-document.getElementById('devisForm').addEventListener('submit', function (event) {
+document.getElementById('myForm').addEventListener('submit', function (event) {
     const recaptchaResponse = grecaptcha.getResponse();
     const errorDiv = document.getElementById('recaptchaError');
 
