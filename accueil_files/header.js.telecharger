@@ -1,0 +1,109 @@
+const imgSliderCon = document.getElementById("imgSliderCon");
+const slideImg = document.querySelectorAll(".slideImg");
+const headerSlider = document.getElementById("headerSlider");
+const sliderPosition = document.querySelectorAll(".sliderPosition");
+
+var isDraggin = false,
+  startPos = 0,
+  currentTranslate = 0,
+  prevTranslate = 0,
+  animationId = 0,
+  currentIdx = 0,
+  lastCurrentIdx = -1;
+var autoSlideId = 0;
+
+const setAutoSlide = () => {
+  autoSlideId = setInterval(() => {
+    if (currentIdx < slideImg.length - 1) {
+      imgSliderCon.style.transition = "900ms ease-out";
+      currentIdx++;
+      setPositionByIndex();
+    } else {
+      currentIdx = 0;
+      setPositionByIndex();
+    }
+    if (currentIdx === 0) {
+      for (let index = 1; index < sliderPosition.length; index++) {
+        sliderPosition[index].style.backgroundColor = "#ddd";
+      }
+    } else {
+      sliderPosition[currentIdx].style.backgroundColor = "#4f6fce";
+    }
+  }, 5000);
+};
+setAutoSlide();
+
+const touchStart = (idx) => {
+  return function (event) {
+    clearInterval(autoSlideId);
+    currentIdx = idx;
+
+    startPos = getPositionX(event);
+    isDraggin = true;
+    animationId = requestAnimationFrame(slideSliderAnimation);
+  };
+};
+const touchMove = (event) => {
+  if (isDraggin) {
+    const currentPosition = getPositionX(event);
+    currentTranslate = prevTranslate + currentPosition - startPos;
+  }
+};
+const touchEnd = () => {
+  isDraggin = false;
+  cancelAnimationFrame(animationId);
+  const movedBy = currentTranslate - prevTranslate;
+  if (movedBy < -100 && currentIdx < slideImg.length - 1) {
+    currentIdx += 1;
+    lastCurrentIdx += 1;
+    sliderPosition[currentIdx].style.backgroundColor = "#4f6fce";
+  }
+
+  if (movedBy > 100 && currentIdx > 0) {
+    currentIdx -= 1;
+    lastCurrentIdx -= 1;
+    sliderPosition[currentIdx + 1].style.backgroundColor = "#ddd";
+  }
+
+  setPositionByIndex();
+};
+const getPositionX = (event) => {
+  return event.type.includes("mouse") ? event.pageX : event.touches[0].clientX;
+};
+const slideSliderAnimation = () => {
+  setSliderPosition();
+  if (isDraggin) requestAnimationFrame(slideSliderAnimation);
+};
+const setSliderPosition = () => {
+  imgSliderCon.style.transform = `translateX(${currentTranslate}px)`;
+};
+const setPositionByIndex = () => {
+  currentTranslate = currentIdx * -headerSlider.clientWidth;
+  prevTranslate = currentTranslate;
+  setSliderPosition();
+};
+slideImg.forEach((event, idx) => {
+  // event.addEventListener('ondrag', {passive: true} )
+  event.addEventListener("touchstart", touchStart(idx), {passive: true});
+  event.addEventListener("touchmove", touchMove, {passive: true});
+  event.addEventListener("touchend", touchEnd, {passive: true});
+
+  event.addEventListener("mousedown", touchStart(idx), {passive: true});
+  event.addEventListener("mousemove", touchMove, {passive: true});
+  event.addEventListener("mouseup", touchEnd, {passive: true});
+  event.addEventListener("mouseleave", touchEnd, {passive: true});
+});
+
+sliderPosition.forEach((event, idx) => {
+  event.addEventListener("click", () => {
+    // console.log(idx);
+    currentIdx = idx;
+    for (let i = 0; i < idx + 1; i++) {
+      sliderPosition[i].style.backgroundColor = "#4f6fce";
+    }
+    for (let a = idx + 1; a < sliderPosition.length; a++) {
+      sliderPosition[a].style.backgroundColor = "#ddd";
+    }
+    setPositionByIndex();
+  }, {passive: true} );
+});

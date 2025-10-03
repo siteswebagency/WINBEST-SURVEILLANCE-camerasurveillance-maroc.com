@@ -1,0 +1,62 @@
+body {
+  font-family:Arial,Helvetica,sans-serif;
+  font-size  : 16px;
+  line-height: 22px;
+  background : #fff
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: -0.05em;
+  color         : #222529
+}
+
+h1 {
+  font-family   : Arial,Helvetica,sans-serif;
+  font-weight   : 300;
+  font-size     : 36px;
+  line-height   : 44px;
+  letter-spacing: -1px;
+  color         : #1d2127
+}
+
+body.wide .container:not(.inner-container) {
+  padding-left : 30px;
+  padding-right: 30px
+}
+
+#paju {
+  text-align: center;
+}
+
+#img-blog {
+  height: 200px;
+  width : 350px;
+}
+
+#col-blog {
+  height: 515px;
+}
+
+#frame-blog {
+  height: 430px;
+}
+
+.justify-blog,
+h2 {
+  text-align: center;
+}
+
+.justify-blog,
+p {
+  text-align: justify;
+}
+#img-article_blog{
+  height: 93px;
+  width: 130px;
+  clip-path: ellipse(37% 50%);
+}
