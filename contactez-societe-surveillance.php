@@ -234,7 +234,7 @@
         <?php
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $recaptchaResponse = $_POST['g-recaptcha-response'];
-                $secretKey = '6LcKg9IrAAAAAOEoEzSax3-LbMyMPuIxLLz8zviD'; // Remplacez par votre clé secrète
+                $secretKey = '6LdfMt0rAAAAADxXV7EXS3gGVZMACMCoLnPn3pVn'; // Remplacez par votre clé secrète
 
                 $url = 'https://www.google.com/recaptcha/api/siteverify';
                 $data = [
@@ -471,7 +471,7 @@ $(document).ready(function(){ $("#Part").hide();$("#Prof").hide();$("#atre").hid
 
 </div>
 <div>
-                      <div class="g-recaptcha" data-sitekey="6LcKg9IrAAAAAGH-xxzrw2Kwuqq10Eg2lcHe4rtM" required=""></div>
+                      <div class="g-recaptcha" data-sitekey="6LdfMt0rAAAAADL41btZuri1ICOpElQvQeOw4dmR" required=""></div>
                       <div id="recaptchaError" style="color: red; display: none;">Veuillez cocher le reCAPTCHA pour continuer.</div>
               </div>
 
