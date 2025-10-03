@@ -24,7 +24,45 @@
 
     <meta name="description"
         content="Société Surveillance Casabalanca: contactez WINBEST SURVEILLANCE pour votre maison à Casablanca Maroc">
+    <style>
+                  /* Container du reCAPTCHA */
+                  .g-recaptcha {
+                width: 100%; /* Laisse le reCAPTCHA occuper toute la largeur disponible */
+                max-width: 400px; /* Limite la largeur maximale du widget */
+                margin: 0 auto; /* Centre le widget horizontalement */
+            }
 
+            /* Erreur reCAPTCHA */
+            #recaptchaError {
+                text-align: center; /* Centrer le texte d'erreur */
+                font-size: 14px; /* Taille de police de l'erreur */
+                margin-top: 10px; /* Espace entre le reCAPTCHA et le message d'erreur */
+            }
+
+            /* Responsive : petite taille d'écran (mobile) */
+            @media (max-width: 480px) {
+                .g-recaptcha {
+                    transform: scale(0.85); /* Réduit la taille du reCAPTCHA pour les petits écrans */
+                    transform-origin: 0 0; /* Centre l'échelle à partir du coin supérieur gauche */
+                }
+            }
+
+            /* Responsive : tablettes (écrans moyens) */
+            @media (max-width: 768px) {
+                .g-recaptcha {
+                    transform: scale(0.9); /* Réduit la taille du reCAPTCHA pour les tablettes */
+                    transform-origin: 0 0;
+                }
+            }
+
+            /* Responsive : écrans plus larges */
+            @media (min-width: 1024px) {
+                .g-recaptcha {
+                    max-width: 500px; /* Si l'écran est large, on augmente la largeur maximale */
+                }
+            }
+
+        </style>
 
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
@@ -192,6 +230,35 @@
 
     <div id="headerImage"></div>
     <h1 class="sectionTitle">DEMANDEZ UN DEVIS GRATUIT</h1>
+            <?php
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $recaptchaResponse = $_POST['g-recaptcha-response'];
+                $secretKey = '6LdfMt0rAAAAADxXV7EXS3gGVZMACMCoLnPn3pVn'; // Remplacez par votre clé secrète
+
+                $url = 'https://www.google.com/recaptcha/api/siteverify';
+                $data = [
+                    'secret' => $secretKey,
+                    'response' => $recaptchaResponse,
+                    'remoteip' => $_SERVER['REMOTE_ADDR']
+                ];
+
+                $options = [
+                    'http' => [
+                        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                        'method'  => 'POST',
+                        'content' => http_build_query($data),
+                    ]
+                ];
+                $context  = stream_context_create($options);
+              $response = file_get_contents($url, false, $context);
+              $result = json_decode($response);
+
+              if ($result->success) {
+              } else {
+                  echo "Erreur : reCAPTCHA non validé.";
+              }
+          }
+      ?>
     <div id="contactUsCon">
 
 <form id="myForm" method="POST">
@@ -403,12 +470,11 @@ $(document).ready(function(){ $("#Part").hide();$("#Prof").hide();$("#atre").hid
                     <textarea type="text" name="senderMessage" placeholder="Message" required=""></textarea><br><br>
 
 </div>
-<div class="inputAndLabelCon">
-                <label id="captchaQuestion"></label><br>
-                <input type="number" placeholder="Entrez bonne reponse " id="captchaAnswer"	required><br><br>
-                <span id="errorMessage" class="error"></span>
-            </div>
 
+<div>
+                      <div class="g-recaptcha" data-sitekey="6LdfMt0rAAAAADL41btZuri1ICOpElQvQeOw4dmR" required=""></div>
+                      <div id="recaptchaError" style="color: red; display: none;">Veuillez cocher le reCAPTCHA pour continuer.</div>
+              </div>
 
 <button id="sendMessageBtn"type="submit"  name="sendEmailSubBtn">ENVOYER</button>
 
@@ -699,40 +765,25 @@ function test_input($data)
     <div class="fixed-btn2">
         <a href="https://api.whatsapp.com/send?phone=+212643662921"><i class="fa fa-whatsapp"></i></a>
     </div>
-    <script>
-        // Fonction pour générer un CAPTCHA
-        function generateCaptcha() {
-            const num1 = Math.floor(Math.random() * 10);
-            const num2 = Math.floor(Math.random() * 10);
-            return { question: `Quel est la somme de ${num1} + ${num2} ?`, answer: num1 + num2 };
-        }
-
-        // Génération initiale du CAPTCHA
-        let captcha = generateCaptcha();
-        document.getElementById('captchaQuestion').innerText = captcha.question;
-
-        // Gestion de l'événement de soumission
-        document.getElementById('myForm').addEventListener('submit', function(event) {
-            const userAnswer = parseInt(document.getElementById('captchaAnswer').value);
-            const errorMessage = document.getElementById('errorMessage');
-
-            if (userAnswer === captcha.answer) {
-                // Si la réponse est correcte, laisser le formulaire s'envoyer
-                errorMessage.innerText = ''; // Supprime le message d'erreur
-            } else {
-                // Si la réponse est incorrecte, empêcher l'envoi et afficher un message
-                event.preventDefault(); // Bloque l'envoi du formulaire
-                errorMessage.innerText = 'Le nombre est incorrect. Veuillez réessayer.';
-                // Générer un nouveau CAPTCHA
-                captcha = generateCaptcha();
-                document.getElementById('captchaQuestion').innerText = captcha.question;
-                document.getElementById('captchaAnswer').value = ''; // Réinitialiser le champ de réponse
-            }
-        });
-    </script>  
+  
     
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
+
+<script>
+document.getElementById('myForm').addEventListener('submit', function (event) {
+    const recaptchaResponse = grecaptcha.getResponse();
+    const errorDiv = document.getElementById('recaptchaError');
+
+    if (!recaptchaResponse) {
+        event.preventDefault();
+        errorDiv.style.display = 'block'; // Affiche le message d'erreur
+    } else {
+        errorDiv.style.display = 'none'; // Cache le message d'erreur si tout est OK
+    }
+});
+</script>
 </body>
 </html>
