@@ -192,6 +192,35 @@
 
     <div id="headerImage"></div>
     <h1 class="sectionTitle">Contactez Nous</h1>
+        <?php
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $recaptchaResponse = $_POST['g-recaptcha-response'];
+                $secretKey = '6LcKg9IrAAAAAOEoEzSax3-LbMyMPuIxLLz8zviD'; // Remplacez par votre clé secrète
+
+                $url = 'https://www.google.com/recaptcha/api/siteverify';
+                $data = [
+                    'secret' => $secretKey,
+                    'response' => $recaptchaResponse,
+                    'remoteip' => $_SERVER['REMOTE_ADDR']
+                ];
+
+                $options = [
+                    'http' => [
+                        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                        'method'  => 'POST',
+                        'content' => http_build_query($data),
+                    ]
+                ];
+                $context  = stream_context_create($options);
+              $response = file_get_contents($url, false, $context);
+              $result = json_decode($response);
+
+              if ($result->success) {
+              } else {
+                  echo "Erreur : reCAPTCHA non validé.";
+              }
+          }
+      ?>
     <div id="contactUsCon">
 
 <form id="myForm" method="POST">
@@ -407,7 +436,10 @@ $(document).ready(function(){ $("#Part").hide();$("#Prof").hide();$("#atre").hid
                 <input type="number" placeholder="Entrez bonne reponse " id="captchaAnswer"	required><br><br>
                 <span id="errorMessage" class="error"></span>
             </div>
-
+<div>
+                      <div class="g-recaptcha" data-sitekey="6LcKg9IrAAAAAGH-xxzrw2Kwuqq10Eg2lcHe4rtM" required=""></div>
+                      <div id="recaptchaError" style="color: red; display: none;">Veuillez cocher le reCAPTCHA pour continuer.</div>
+              </div>
 
 <button id="sendMessageBtn" type="submit"  name="sendEmailSubBtn">ENVOYER</button>
 
@@ -698,37 +730,7 @@ function test_input($data)
     <div class="fixed-btn2">
         <a href="https://api.whatsapp.com/send?phone=+212643662921"><i class="fa fa-whatsapp"></i></a>
     </div>
-    <script>
-        // Fonction pour générer un CAPTCHA
-        function generateCaptcha() {
-            const num1 = Math.floor(Math.random() * 10);
-            const num2 = Math.floor(Math.random() * 10);
-            return { question: `Quel est la somme de ${num1} + ${num2} ?`, answer: num1 + num2 };
-        }
-
-        // Génération initiale du CAPTCHA
-        let captcha = generateCaptcha();
-        document.getElementById('captchaQuestion').innerText = captcha.question;
-
-        // Gestion de l'événement de soumission
-        document.getElementById('myForm').addEventListener('submit', function(event) {
-            const userAnswer = parseInt(document.getElementById('captchaAnswer').value);
-            const errorMessage = document.getElementById('errorMessage');
-
-            if (userAnswer === captcha.answer) {
-                // Si la réponse est correcte, laisser le formulaire s'envoyer
-                errorMessage.innerText = ''; // Supprime le message d'erreur
-            } else {
-                // Si la réponse est incorrecte, empêcher l'envoi et afficher un message
-                event.preventDefault(); // Bloque l'envoi du formulaire
-                errorMessage.innerText = 'Le nombre est incorrect. Veuillez réessayer.';
-                // Générer un nouveau CAPTCHA
-                captcha = generateCaptcha();
-                document.getElementById('captchaQuestion').innerText = captcha.question;
-                document.getElementById('captchaAnswer').value = ''; // Réinitialiser le champ de réponse
-            }
-        });
-    </script>  
+ 
     
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
